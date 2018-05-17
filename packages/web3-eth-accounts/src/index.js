@@ -492,15 +492,25 @@ Wallet.prototype.encrypt = function (password, options) {
 Wallet.prototype.decrypt = function (encryptedWallet, password) {
     var _this = this;
 
-    encryptedWallet.forEach(function (keystore) {
-        var account = _this._accounts.decrypt(keystore, password);
+    if(Array.isArray(encryptedWallet)){
+        encryptedWallet.forEach(function (keystore) {
+            var account = _this._accounts.decrypt(keystore, password);
+
+            if (account) {
+                _this.add(account);
+            } else {
+                throw new Error('Couldn\'t decrypt accounts. Password wrong?');
+            }
+        });
+    } else {
+        var account = _this._accounts.decrypt(encryptedWallet, password);
 
         if (account) {
             _this.add(account);
         } else {
             throw new Error('Couldn\'t decrypt accounts. Password wrong?');
         }
-    });
+    }
 
     return this;
 };
